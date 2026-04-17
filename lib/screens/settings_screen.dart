@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
@@ -57,7 +58,7 @@ class SettingsScreen extends StatelessWidget {
                 subtitle: Text(
                   langProvider.currentLanguage == 'bn' ? 'বাংলা' : 'English',
                 ),
-                leading: const Icon(Icons.language, color: AppTheme.accent),
+                leading: Icon(LucideIcons.globe, color: AppTheme.accent),
                 onTap: () {
                   final newLang = langProvider.currentLanguage == 'en'
                       ? 'bn'
@@ -70,7 +71,7 @@ class SettingsScreen extends StatelessWidget {
               ListTile(
                 title: const Text('Rate & Review'),
                 subtitle: const Text('Help us grow on Play Store'),
-                leading: const Icon(Icons.star_outline, color: AppTheme.accent),
+                leading: Icon(LucideIcons.star, color: AppTheme.accent),
                 onTap: () => _launchUrl(
                   'https://play.google.com/store/apps/details?id=com.oiapplications.oiqrscanner',
                 ),
@@ -78,8 +79,8 @@ class SettingsScreen extends StatelessWidget {
               ListTile(
                 title: const Text('Our More Apps'),
                 subtitle: const Text('Explore more from Oi Applications'),
-                leading: const Icon(
-                  Icons.apps_outlined,
+                leading: Icon(
+                  LucideIcons.layoutGrid,
                   color: AppTheme.accent,
                 ),
                 onTap: () => _launchUrl(
@@ -89,8 +90,8 @@ class SettingsScreen extends StatelessWidget {
               ListTile(
                 title: const Text('Share App'),
                 subtitle: const Text('Spread the word with friends'),
-                leading: const Icon(
-                  Icons.share_outlined,
+                leading: Icon(
+                  LucideIcons.share,
                   color: AppTheme.accent,
                 ),
                 onTap: () async => await Share.share(
@@ -100,7 +101,7 @@ class SettingsScreen extends StatelessWidget {
               const Divider(height: 32, color: Colors.white10),
               ListTile(
                 title: const Text('Privacy Policy'),
-                leading: const Icon(Icons.privacy_tip_outlined),
+                leading: Icon(LucideIcons.shieldAlert),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -149,6 +150,7 @@ class SettingsScreen extends StatelessWidget {
       child: Column(
         children: [
           SwitchListTile(
+            secondary: Icon(provider.isSoundEnabled ? LucideIcons.volume2 : LucideIcons.volumeX, color: AppTheme.accent),
             title: const Text('Sound Feedback'),
             subtitle: const Text('Futuristic "Cyber-Chime" on success'),
             value: provider.isSoundEnabled,
@@ -163,6 +165,7 @@ class SettingsScreen extends StatelessWidget {
             color: Colors.white10,
           ),
           SwitchListTile(
+            secondary: Icon(LucideIcons.vibrate, color: AppTheme.accent),
             title: const Text('Haptic Feedback'),
             subtitle: const Text('Premium "Double-Tap" tactile feel'),
             value: provider.isHapticEnabled,

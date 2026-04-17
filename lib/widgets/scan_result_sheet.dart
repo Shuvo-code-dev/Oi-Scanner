@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:google_mlkit_language_id/google_mlkit_language_id.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_theme.dart';
 import '../providers/history_provider.dart';
 
@@ -70,7 +71,7 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
     
     if (widget.resultType != 'url') {
       return (
-        icon: Icons.verified_user_outlined,
+        icon: LucideIcons.shieldCheck,
         color: AppTheme.accent,
         label: 'Verified Format',
         description: 'This ${widget.resultType} format follows standard structures.',
@@ -81,14 +82,14 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
       final shorteners = ['bit.ly', 't.co', 'goo.gl', 'tinyurl.com', 'is.gd', 'buff.ly', 'rebrand.ly'];
       if (shorteners.any((s) => content.contains(s))) {
         return (
-          icon: Icons.warning_amber_rounded,
+          icon: LucideIcons.shieldAlert,
           color: Colors.orangeAccent,
           label: 'URL Masked',
           description: 'This is a shortened URL. The actual destination is hidden.',
         );
       }
       return (
-        icon: Icons.security,
+        icon: LucideIcons.shieldCheck,
         color: Colors.greenAccent,
         label: 'Secure Link',
         description: 'This link uses modern encryption (HTTPS).',
@@ -97,7 +98,7 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
 
     if (content.startsWith('http://')) {
       return (
-        icon: Icons.gpp_maybe_rounded,
+        icon: LucideIcons.shieldAlert,
         color: Colors.redAccent,
         label: 'Insecure Link',
         description: 'Caution: This site uses unencrypted HTTP protocol.',
@@ -105,7 +106,7 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
     }
 
     return (
-      icon: Icons.help_outline,
+      icon: LucideIcons.shield,
       color: Colors.grey,
       label: 'Unknown',
       description: 'Unable to verify the safety profile of this content.',
@@ -244,13 +245,13 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
         Row(
           children: [
             if (widget.resultType == 'url')
-              Expanded(child: _buildNeumorphicButton(onPressed: () => _launchURL(widget.content), icon: Icons.open_in_new_rounded, label: 'Open Link', isPrimary: true)),
+              Expanded(child: _buildNeumorphicButton(onPressed: () => _launchURL(widget.content), icon: LucideIcons.externalLink, label: 'Open Link', isPrimary: true)),
             if (widget.resultType == 'phone')
-              Expanded(child: _buildNeumorphicButton(onPressed: () => _launchURL('tel:${widget.content}'), icon: Icons.call_rounded, label: 'Call Now', isPrimary: true)),
+              Expanded(child: _buildNeumorphicButton(onPressed: () => _launchURL('tel:${widget.content}'), icon: LucideIcons.phone, label: 'Call Now', isPrimary: true)),
             if (widget.resultType == 'payment')
-              Expanded(child: _buildNeumorphicButton(onPressed: () => _launchURL(widget.content), icon: Icons.payments_rounded, label: 'Pay Now', isPrimary: true)),
+              Expanded(child: _buildNeumorphicButton(onPressed: () => _launchURL(widget.content), icon: LucideIcons.creditCard, label: 'Pay Now', isPrimary: true)),
             if (widget.resultType == 'event')
-              Expanded(child: _buildNeumorphicButton(onPressed: () => _launchURL('https://www.google.com/calendar/render?action=TEMPLATE&text=Scanned%20Event&details=${Uri.encodeComponent(widget.content)}'), icon: Icons.calendar_today_rounded, label: 'Schedule', isPrimary: true)),
+              Expanded(child: _buildNeumorphicButton(onPressed: () => _launchURL('https://www.google.com/calendar/render?action=TEMPLATE&text=Scanned%20Event&details=${Uri.encodeComponent(widget.content)}'), icon: LucideIcons.calendar, label: 'Schedule', isPrimary: true)),
             if (widget.resultType == 'wifi')
               Expanded(
                 child: _buildNeumorphicButton(
@@ -260,31 +261,31 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(success ? 'Connected to WiFi' : 'Failed to connect')));
                     }
                   },
-                  icon: Icons.wifi_rounded,
+                  icon: LucideIcons.wifi,
                   label: 'Connect WiFi',
                   isPrimary: true,
                 ),
               ),
             if (widget.resultType == 'text' || widget.resultType == 'email')
-              Expanded(child: _buildNeumorphicButton(onPressed: () => _copyToClipboard(context, widget.content), icon: Icons.copy_rounded, label: 'Copy Text', isPrimary: true)),
+              Expanded(child: _buildNeumorphicButton(onPressed: () => _copyToClipboard(context, widget.content), icon: LucideIcons.copy, label: 'Copy Text', isPrimary: true)),
           ],
         ),
         const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(child: _buildNeumorphicButton(onPressed: () => Share.share(_translatedText ?? widget.content), icon: Icons.share_rounded, label: 'Share')),
+            Expanded(child: _buildNeumorphicButton(onPressed: () => Share.share(_translatedText ?? widget.content), icon: LucideIcons.share2, label: 'Share')),
             if (widget.type == 'ocr' && _translatedText == null) ...[
               const SizedBox(width: 12),
               Expanded(
                 child: _buildNeumorphicButton(
                   onPressed: _isTranslating ? () {} : () => _translateText(widget.content),
-                  icon: Icons.translate_rounded,
+                  icon: LucideIcons.languages,
                   label: _isTranslating ? 'Translating...' : 'Translate',
                 ),
               ),
             ],
             const SizedBox(width: 12),
-            Expanded(child: _buildNeumorphicButton(onPressed: () => Navigator.pop(context), icon: Icons.close_rounded, label: 'Dismiss')),
+            Expanded(child: _buildNeumorphicButton(onPressed: () => Navigator.pop(context), icon: LucideIcons.x, label: 'Dismiss')),
           ],
         ),
       ],

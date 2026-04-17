@@ -7,6 +7,7 @@ import './settings_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/navigation_provider.dart';
 import '../providers/language_provider.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -60,10 +61,10 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         type: BottomNavigationBarType.fixed,
         items: [
-          BottomNavigationBarItem(icon: const Icon(Icons.qr_code_scanner), label: langProvider.getText('tab_scan')),
-          BottomNavigationBarItem(icon: const Icon(Icons.add_box_outlined), label: langProvider.getText('tab_generate')),
-          BottomNavigationBarItem(icon: const Icon(Icons.history), label: langProvider.getText('tab_history')),
-          BottomNavigationBarItem(icon: const Icon(Icons.settings_outlined), label: langProvider.getText('tab_settings')),
+          BottomNavigationBarItem(icon: Icon(LucideIcons.scan, size: 20), label: langProvider.getText('tab_scan')),
+          BottomNavigationBarItem(icon: Icon(LucideIcons.plusSquare, size: 20), label: langProvider.getText('tab_generate')),
+          BottomNavigationBarItem(icon: Icon(LucideIcons.history, size: 20), label: langProvider.getText('tab_history')),
+          BottomNavigationBarItem(icon: Icon(LucideIcons.settings, size: 20), label: langProvider.getText('tab_settings')),
         ],
       ),
     );

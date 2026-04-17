@@ -10,6 +10,7 @@ import 'package:gal/gal.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class GeneratorScreen extends StatefulWidget {
   const GeneratorScreen({super.key});
@@ -75,9 +76,9 @@ class _GeneratorScreenState extends State<GeneratorScreen> {
       case 'WiFi':
         return Column(
           children: [
-            _buildField(_wifiSsidController, 'Network Name (SSID)', Icons.wifi),
+            _buildField(_wifiSsidController, 'Network Name (SSID)', LucideIcons.wifi),
             const SizedBox(height: 12),
-            _buildField(_wifiPasswordController, 'Password', Icons.lock_outline, obscure: true),
+            _buildField(_wifiPasswordController, 'Password', LucideIcons.lock, obscure: true),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -104,13 +105,13 @@ class _GeneratorScreenState extends State<GeneratorScreen> {
           ],
         );
       case 'Phone':
-        return _buildField(_phoneController, 'Phone Number', Icons.phone, keyboard: TextInputType.phone);
+        return _buildField(_phoneController, 'Phone Number', LucideIcons.phone, keyboard: TextInputType.phone);
       case 'Email':
-        return _buildField(_emailController, 'Email Address', Icons.email_outlined, keyboard: TextInputType.emailAddress);
+        return _buildField(_emailController, 'Email Address', LucideIcons.mail, keyboard: TextInputType.emailAddress);
       case 'URL':
-        return _buildField(_textController, 'Enter URL (e.g. google.com)', Icons.link, keyboard: TextInputType.url);
+        return _buildField(_textController, 'Enter URL (e.g. google.com)', LucideIcons.link, keyboard: TextInputType.url);
       default:
-        return _buildField(_textController, 'Enter Text', Icons.edit_outlined, maxLines: 3);
+        return _buildField(_textController, 'Enter Text', LucideIcons.edit3, maxLines: 3);
     }
   }
 
@@ -361,7 +362,7 @@ class _GeneratorScreenState extends State<GeneratorScreen> {
         Expanded(
           child: ElevatedButton.icon(
             onPressed: _shareQrCode,
-            icon: const Icon(Icons.share_rounded),
+            icon: Icon(LucideIcons.share, size: 18),
             label: const Text('Share'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.surface,
@@ -374,7 +375,7 @@ class _GeneratorScreenState extends State<GeneratorScreen> {
         Expanded(
           child: OutlinedButton.icon(
             onPressed: _saveQrCode,
-            icon: const Icon(Icons.download_rounded),
+            icon: Icon(LucideIcons.download, size: 18),
             label: const Text('Save'),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),

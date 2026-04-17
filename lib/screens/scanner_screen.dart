@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart' as mlkit;
 import 'package:image_picker/image_picker.dart';
@@ -251,7 +252,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                 Text('Current Batch', style: Theme.of(context).textTheme.titleLarge),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
+                  icon: const Icon(LucideIcons.x),
                 ),
               ],
             ),
@@ -267,7 +268,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                           title: Text(scan.content, maxLines: 1, overflow: TextOverflow.ellipsis),
                           subtitle: Text(DateFormat('hh:mm:ss a').format(scan.scannedAt)),
                           trailing: IconButton(
-                            icon: const Icon(Icons.remove_circle_outline, color: Colors.redAccent),
+                            icon: const Icon(LucideIcons.minusCircle, color: Colors.redAccent),
                             onPressed: () => provider.removeFromBatch(index),
                           ),
                         );
@@ -299,27 +300,27 @@ class _ScannerScreenState extends State<ScannerScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Feature Guide', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.accent)),
-                IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+                IconButton(icon: const Icon(LucideIcons.x), onPressed: () => Navigator.pop(context)),
               ],
             ),
             const SizedBox(height: 16),
             const ListTile(
-              leading: Icon(Icons.layers_outlined, color: AppTheme.textSecondary),
+              leading: Icon(LucideIcons.layers, color: AppTheme.textSecondary),
               title: Text('Batch Mode', style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text('Scan multiple items in sequence and save them all at once.'),
             ),
             const ListTile(
-              leading: Icon(Icons.image_outlined, color: AppTheme.textSecondary),
+              leading: Icon(LucideIcons.image, color: AppTheme.textSecondary),
               title: Text('Gallery Scan', style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text('Import QR codes or Barcodes directly from your photos.'),
             ),
             const ListTile(
-              leading: Icon(Icons.text_fields_outlined, color: AppTheme.textSecondary),
+              leading: Icon(LucideIcons.type, color: AppTheme.textSecondary),
               title: Text('OCR Text Recognition', style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text('Extract text from any image using smart OCR technology.'),
             ),
             const ListTile(
-              leading: Icon(Icons.translate, color: AppTheme.textSecondary),
+              leading: Icon(LucideIcons.languages, color: AppTheme.textSecondary),
               title: Text('Offline Translation', style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text('Translate scanned text directly into Bengali.'),
             ),
@@ -456,7 +457,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.help_outline, color: Colors.white, size: 28),
+                    icon: Icon(LucideIcons.helpCircle, color: Colors.white, size: 24),
                     onPressed: () {
                       HapticFeedback.lightImpact();
                       _showHelpGuide(context);
@@ -476,7 +477,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildSmallToggle(
-                      icon: Icons.layers_outlined,
+                      icon: LucideIcons.layers,
                       label: 'Batch',
                       isActive: provider.isBatchMode,
                       onTap: () => provider.toggleBatchMode(),
@@ -497,7 +498,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.list_alt, size: 16, color: Colors.black),
+                              Icon(LucideIcons.list, size: 14, color: Colors.black),
                               const SizedBox(width: 4),
                               Text(
                                 '${provider.batchScans.length}',
@@ -522,7 +523,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildCircleButton(
-                    icon: _isFlashOn ? Icons.flashlight_off_outlined : Icons.flashlight_on_outlined,
+                    icon: _isFlashOn ? LucideIcons.flashlightOff : LucideIcons.flashlight,
                     onPressed: () {
                       _controller.toggleTorch();
                       setState(() => _isFlashOn = !_isFlashOn);
@@ -531,12 +532,12 @@ class _ScannerScreenState extends State<ScannerScreen> {
                   Row(
                     children: [
                       _buildCircleButton(
-                        icon: Icons.text_fields_outlined,
+                        icon: LucideIcons.type,
                         onPressed: _pickImageAndProcessOCR,
                       ),
                       const SizedBox(width: 20),
                       _buildCircleButton(
-                        icon: Icons.image_outlined,
+                        icon: LucideIcons.image,
                         onPressed: _pickImageAndScanQR,
                       ),
                     ],

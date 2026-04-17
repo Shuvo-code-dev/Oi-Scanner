@@ -10,6 +10,7 @@ import '../theme/app_theme.dart';
 import '../widgets/scan_result_sheet.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -94,7 +95,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               onChanged: (val) => setState(() => _searchQuery = val),
               decoration: InputDecoration(
                 hintText: 'Search history...',
-                prefixIcon: const Icon(Icons.search, size: 20),
+                prefixIcon: Icon(LucideIcons.search, size: 18),
                 filled: true,
                 contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                 fillColor: Colors.white.withValues(alpha: 0.05),
@@ -107,7 +108,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
           const SizedBox(width: 8),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.download, color: AppTheme.accent),
+            icon: Icon(LucideIcons.download, color: AppTheme.accent, size: 20),
             tooltip: 'Export History',
             onSelected: (val) async {
               final p = context.read<HistoryProvider>();
@@ -158,7 +159,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
           IconButton(
             onPressed: () => _showClearConfirmation(context, provider),
-            icon: const Icon(Icons.delete_sweep_outlined, color: Colors.redAccent),
+            icon: Icon(LucideIcons.trash2, color: Colors.redAccent, size: 20),
             tooltip: 'Clear All History',
           ),
         ],
@@ -235,7 +236,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             color: Colors.redAccent.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(24),
           ),
-          child: const Icon(Icons.delete, color: Colors.redAccent),
+          child: Icon(LucideIcons.trash2, color: Colors.redAccent, size: 24),
         ),
         onDismissed: (_) => provider.deleteScan(scan.id!),
         child: GestureDetector(
@@ -280,9 +281,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ),
                     IconButton(
                       icon: Icon(
-                        scan.isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
+                        scan.isFavorite ? LucideIcons.star : LucideIcons.star,
                         color: scan.isFavorite ? Colors.amber : Colors.white24,
-                        size: 20,
+                        size: 18,
                       ),
                       onPressed: () {
                         HapticFeedback.lightImpact();
@@ -338,11 +339,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   IconData _getCategoryIcon(String category) {
     switch (category) {
-      case 'Web': return Icons.language;
-      case 'Contact': return Icons.person;
-      case 'Work': return Icons.business_center;
-      case 'Network': return Icons.wifi;
-      default: return Icons.description;
+      case 'Web': return LucideIcons.globe;
+      case 'Contact': return LucideIcons.user;
+      case 'Work': return LucideIcons.briefcase;
+      case 'Network': return LucideIcons.wifi;
+      default: return LucideIcons.fileText;
     }
   }
 
@@ -353,9 +354,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.history_outlined,
-            size: 80,
-            color: AppTheme.textSecondary.withValues(alpha: 0.3),
+            LucideIcons.history,
+            size: 60,
+            color: AppTheme.textSecondary.withValues(alpha: 0.2),
           ),
           const SizedBox(height: 16),
           Text(
@@ -371,7 +372,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             onPressed: () {
               context.read<NavigationProvider>().setIndex(0);
             },
-            icon: const Icon(Icons.qr_code_scanner),
+            icon: Icon(LucideIcons.scan, size: 18),
             label: Text(langProvider.getText('scan_now')),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
