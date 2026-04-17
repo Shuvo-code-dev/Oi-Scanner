@@ -152,7 +152,7 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
                   _buildContentCard(),
                   const SizedBox(height: 32),
                   _buildActionButtons(context, context.read<HistoryProvider>()),
-                  const SizedBox(height: 20),
+                  SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
                 ],
               ),
             ),
@@ -181,17 +181,18 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
             children: [
               Text(
                 'Safety Shield',
-                style: TextStyle(color: safety.color, fontWeight: FontWeight.bold, letterSpacing: 1.2, fontSize: 12),
+                style: TextStyle(color: safety.color, fontWeight: FontWeight.bold, letterSpacing: 1.2, fontSize: 11),
               ),
               Text(
                 safety.label,
-                style: const TextStyle(color: AppTheme.textPrimary, fontSize: 18, fontWeight: FontWeight.w900),
+                style: const TextStyle(color: AppTheme.textPrimary, fontSize: 18, fontWeight: FontWeight.w900, height: 1.1),
               ),
             ],
           ),
         ),
+        const SizedBox(width: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
             color: AppTheme.surface.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(20),
@@ -217,20 +218,20 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('SCANNED CONTENT', style: TextStyle(fontSize: 10, color: AppTheme.textSecondary, fontWeight: FontWeight.bold)),
+          const Text('SCANNED CONTENT', style: TextStyle(fontSize: 10, color: AppTheme.textSecondary, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
           const SizedBox(height: 12),
           SelectableText(
             widget.content,
-            style: const TextStyle(fontSize: 16, height: 1.5, fontWeight: FontWeight.w500),
+            style: const TextStyle(fontSize: 15, height: 1.5, fontWeight: FontWeight.w500, color: Colors.white),
           ),
           if (_translatedText != null) ...[
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
               child: Divider(color: Colors.white12),
             ),
-            const Text('TRANSLATION (BENGALI)', style: TextStyle(fontSize: 10, color: AppTheme.accent, fontWeight: FontWeight.bold)),
+            const Text('TRANSLATION (BENGALI)', style: TextStyle(fontSize: 10, color: AppTheme.accent, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
             const SizedBox(height: 8),
-            Text(_translatedText!, style: const TextStyle(fontSize: 16, color: Colors.white)),
+            Text(_translatedText!, style: const TextStyle(fontSize: 16, color: Colors.white, height: 1.4)),
           ],
         ],
       ),
@@ -273,7 +274,7 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
           children: [
             Expanded(child: _buildNeumorphicButton(onPressed: () => Share.share(_translatedText ?? widget.content), icon: Icons.share_rounded, label: 'Share')),
             if (widget.type == 'ocr' && _translatedText == null) ...[
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: _buildNeumorphicButton(
                   onPressed: _isTranslating ? () {} : () => _translateText(widget.content),
@@ -282,7 +283,7 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
                 ),
               ),
             ],
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(child: _buildNeumorphicButton(onPressed: () => Navigator.pop(context), icon: Icons.close_rounded, label: 'Dismiss')),
           ],
         ),
@@ -297,7 +298,8 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
         onPressed();
       },
       child: Container(
-        height: 60,
+        height: 56,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
           color: isPrimary ? AppTheme.accent : AppTheme.surface.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(16),
@@ -308,9 +310,9 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
               blurRadius: 2,
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.5),
+              color: Colors.black.withValues(alpha: 0.4),
               offset: const Offset(3, 3),
-              blurRadius: 8,
+              blurRadius: 6,
             ),
           ],
           border: Border.all(
@@ -321,14 +323,19 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: isPrimary ? Colors.black : Colors.white70, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: isPrimary ? Colors.black : Colors.white70,
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
+            Icon(icon, color: isPrimary ? Colors.black : Colors.white70, size: 18),
+            const SizedBox(width: 6),
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: isPrimary ? Colors.black : Colors.white70,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
               ),
             ),
           ],

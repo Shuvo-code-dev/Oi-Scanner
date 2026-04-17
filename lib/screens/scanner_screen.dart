@@ -330,228 +330,237 @@ class _ScannerScreenState extends State<ScannerScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<HistoryProvider>();
 
-    return Stack(
-      children: [
-        GestureDetector(
-          onScaleUpdate: (details) {
-            if (details.scale > 1.0) {
-              _zoomFactor = (_zoomFactor + 0.01).clamp(0.0, 1.0);
-            } else if (details.scale < 1.0) {
-              _zoomFactor = (_zoomFactor - 0.01).clamp(0.0, 1.0);
-            }
-            _controller.setZoomScale(_zoomFactor);
-          },
-          child: RepaintBoundary(
-            child: MobileScanner(
-              controller: _controller,
-              onDetect: _onDetect,
-              scanWindow: Rect.fromCenter(
-                center: Offset(
-                  MediaQuery.of(context).size.width / 2, // Fixed center X
-                  MediaQuery.of(context).size.height / 2, // Fixed center Y
-                ),
-                width: 250,
-                height: 250,
-              ),
-            ),
-          ),
-        ),
-        Positioned.fill(
-          child: RepaintBoundary(
-            child: CustomPaint(
-              painter: ScannerShroudPainter(
-                windowRect: Rect.fromCenter(
-                  center: Offset(
-                    MediaQuery.of(context).size.width / 2,
-                    MediaQuery.of(context).size.height / 2,
-                  ),
-                  width: 250,
-                  height: 250,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double screenWidth = constraints.maxWidth;
+        final double screenHeight = constraints.maxHeight;
+        
+        // Define ROI (Region of Interest) - 250x250 centered perfectly in the widget
+        const double roiSize = 250.0;
+        final Rect windowRect = Rect.fromCenter(
+          center: Offset(screenWidth / 2, screenHeight / 2),
+          width: roiSize,
+          height: roiSize,
+        );
+
+        return Stack(
+          children: [
+            GestureDetector(
+              onScaleUpdate: (details) {
+                if (details.scale > 1.0) {
+                  _zoomFactor = (_zoomFactor + 0.01).clamp(0.0, 1.0);
+                } else if (details.scale < 1.0) {
+                  _zoomFactor = (_zoomFactor - 0.01).clamp(0.0, 1.0);
+                }
+                _controller.setZoomScale(_zoomFactor);
+              },
+              child: RepaintBoundary(
+                child: MobileScanner(
+                  controller: _controller,
+                  onDetect: _onDetect,
+                  scanWindow: windowRect,
                 ),
               ),
             ),
-          ),
-        ),
-        // Neon Brackets & Line
-        Center(
-          child: SizedBox(
-            width: 250,
-            height: 250,
-            child: Stack(
-              children: [
-                // Pulse Animation for Brackets
-                Positioned.fill(
-                  child: RepaintBoundary(
-                    child: AnimatedBuilder(
-                      animation: _controller, // Using controller or a dedicated pulse
-                      builder: (context, child) {
-                        return CustomPaint(
-                          painter: ScannerBracketsPainter(
-                            pulse: _isPulseActive ? 1.0 : 0.0,
-                            color: AppTheme.accent,
-                          ),
-                        );
-                      },
-                    )
-                    .animate(onPlay: (c) => c.repeat(reverse: true))
-                    .scale(begin: const Offset(1, 1), end: const Offset(1.02, 1.02), duration: 1200.ms, curve: Curves.easeInOut),
+            Positioned.fill(
+              child: RepaintBoundary(
+                child: CustomPaint(
+                  painter: ScannerShroudPainter(
+                    windowRect: windowRect,
                   ),
                 ),
-                // Neon Scan Line (Simplified but smoother)
-                RepaintBoundary(
-                  child: Container(
-                    width: 250,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppTheme.accent.withValues(alpha: 0),
-                          AppTheme.accent,
-                          AppTheme.accent.withValues(alpha: 0),
-                        ],
+              ),
+            ),
+            // Neon Brackets & Line
+            Center(
+              child: SizedBox(
+                width: roiSize,
+                height: roiSize,
+                child: Stack(
+                  children: [
+                    // Pulse Animation for Brackets
+                    Positioned.fill(
+                      child: RepaintBoundary(
+                        child: AnimatedBuilder(
+                          animation: _controller,
+                          builder: (context, child) {
+                            return CustomPaint(
+                              painter: ScannerBracketsPainter(
+                                pulse: _isPulseActive ? 1.0 : 0.0,
+                                color: AppTheme.accent,
+                              ),
+                            );
+                          },
+                        )
+                        .animate(onPlay: (c) => c.repeat(reverse: true))
+                        .scale(begin: const Offset(1, 1), end: const Offset(1.02, 1.02), duration: 1200.ms, curve: Curves.easeInOut),
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.accent.withValues(alpha: 0.6),
-                          blurRadius: 10,
-                          spreadRadius: 2,
+                    ),
+                    // Neon Scan Line (Isolated RepaintBoundary)
+                    RepaintBoundary(
+                      child: Container(
+                        width: roiSize,
+                        height: 3,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              AppTheme.accent.withValues(alpha: 0),
+                              AppTheme.accent,
+                              AppTheme.accent.withValues(alpha: 0),
+                            ],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.accent.withValues(alpha: 0.4), // Reduced blur alpha for performance
+                              blurRadius: 8,
+                              spreadRadius: 1,
+                            ),
+                          ],
+                        ),
+                      )
+                      .animate(onPlay: (controller) => controller.repeat(reverse: true))
+                      .moveY(begin: 0, end: roiSize, duration: 2500.ms, curve: Curves.easeInOut),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (_isProcessingOCR)
+              const Center(child: CircularProgressIndicator(color: AppTheme.accent)),
+            
+            // Mode Controls & Batch Indicator (SafeArea)
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const SizedBox(width: 48), // Spare space for balance
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildModeButton(true, 'QR Code'),
+                              _buildModeButton(false, 'Barcode'),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.help_outline, color: Colors.white, size: 28),
+                          onPressed: () {
+                            HapticFeedback.lightImpact();
+                            _showHelpGuide(context);
+                          },
                         ),
                       ],
                     ),
-                  )
-                  .animate(onPlay: (controller) => controller.repeat(reverse: true))
-                  .moveY(begin: 0, end: 250, duration: 2500.ms, curve: Curves.easeInOut),
-                ),
-              ],
-            ),
-          ),
-        ),
-        if (_isProcessingOCR)
-          const Center(child: CircularProgressIndicator(color: AppTheme.accent)),
-        // Batch Indicator
-        if (provider.isBatchMode && provider.batchScans.isNotEmpty)
-          Positioned(
-            top: 100,
-            right: 20,
-            child: GestureDetector(
-              onTap: () => _showBatchPreview(context, provider),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppTheme.accent,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(color: AppTheme.accent.withValues(alpha: 0.3), blurRadius: 10, spreadRadius: 2),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.list_alt, size: 16),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Items: ${provider.batchScans.length}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildSmallToggle(
+                          icon: Icons.layers_outlined,
+                          label: 'Batch',
+                          isActive: provider.isBatchMode,
+                          onTap: () => provider.toggleBatchMode(),
+                        ),
+                        if (provider.isBatchMode && provider.batchScans.isNotEmpty) ...[
+                          const SizedBox(width: 12),
+                          GestureDetector(
+                            onTap: () => _showBatchPreview(context, provider),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: AppTheme.accent,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(color: AppTheme.accent.withValues(alpha: 0.3), blurRadius: 10),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.list_alt, size: 16, color: Colors.black),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${provider.batchScans.length}',
+                                    style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ).animate().scale(),
+                        ],
+                      ],
                     ),
                   ],
                 ),
               ),
             ),
-          ),
-        // Mode Controls
-        Positioned(
-          top: 40,
-          left: 0,
-          right: 0,
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildModeButton(true, 'QR Code'),
-                    _buildModeButton(false, 'Barcode'),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+
+            // Bottom Controls (Relative to bottom)
+            Positioned(
+              bottom: 40,
+              left: 40,
+              right: 40,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildSmallToggle(
-                    icon: Icons.layers_outlined,
-                    label: 'Batch',
-                    isActive: provider.isBatchMode,
-                    onTap: () => provider.toggleBatchMode(),
+                  if (provider.isBatchMode && provider.batchScans.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 24),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 54,
+                        child: ElevatedButton(
+                          onPressed: () => provider.saveBatch(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.accent,
+                            foregroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          ),
+                          child: const Text('SAVE BATCH RESULTS', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ).animate().slideY(begin: 1, end: 0),
+                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildCircleButton(
+                        icon: _isFlashOn ? Icons.flashlight_off_outlined : Icons.flashlight_on_outlined,
+                        onPressed: () {
+                          _controller.toggleTorch();
+                          setState(() => _isFlashOn = !_isFlashOn);
+                        },
+                      ),
+                      Row(
+                        children: [
+                          _buildCircleButton(
+                            icon: Icons.text_fields_outlined,
+                            onPressed: _pickImageAndProcessOCR,
+                          ),
+                          const SizedBox(width: 20),
+                          _buildCircleButton(
+                            icon: Icons.image_outlined,
+                            onPressed: _pickImageAndScanQR,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-        ),
-        // Help Guide
-        Positioned(
-          top: 40,
-          right: 20,
-          child: IconButton(
-            icon: const Icon(Icons.help_outline, color: Colors.white, size: 28),
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              _showHelpGuide(context);
-            },
-          ),
-        ),
-        // Bottom Controls
-        Positioned(
-          bottom: provider.isBatchMode ? 160 : 100,
-          left: 40,
-          right: 40,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildCircleButton(
-                icon: _isFlashOn ? Icons.flashlight_off_outlined : Icons.flashlight_on_outlined,
-                onPressed: () {
-                  _controller.toggleTorch();
-                  setState(() => _isFlashOn = !_isFlashOn);
-                },
-              ),
-              Row(
-                children: [
-                  _buildCircleButton(
-                    icon: Icons.text_fields_outlined,
-                    onPressed: _pickImageAndProcessOCR,
-                  ),
-                  const SizedBox(width: 20),
-                  _buildCircleButton(
-                    icon: Icons.image_outlined,
-                    onPressed: _pickImageAndScanQR,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        if (provider.isBatchMode && provider.batchScans.isNotEmpty)
-          Positioned(
-            bottom: 100,
-            left: 60,
-            right: 60,
-            child: ElevatedButton(
-              onPressed: () => provider.saveBatch(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.accent,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-              ),
-              child: const Text('Save Batch Result'),
             ),
-          ),
-      ],
+          ],
+        );
+      },
     );
   }
 

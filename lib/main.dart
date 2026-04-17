@@ -4,7 +4,7 @@ import './theme/app_theme.dart';
 import './providers/history_provider.dart';
 import './providers/navigation_provider.dart';
 import './providers/language_provider.dart';
-import './screens/splash_screen.dart';
+import './screens/home_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -29,7 +29,7 @@ class OiScannerApp extends StatelessWidget {
       title: 'Oi QR Scanner',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const SplashScreen(),
+      home: const HomeScreen(),
     );
   }
 }

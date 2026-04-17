@@ -48,25 +48,32 @@ class _HistoryScreenState extends State<HistoryScreen> {
               }
 
               return AnimationLimiter(
-                child: MasonryGridView.count(
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  itemCount: filteredHistory.length,
-                  itemBuilder: (context, index) {
-                    final scan = filteredHistory[index];
-                    return AnimationConfiguration.staggeredGrid(
-                      position: index,
-                      duration: const Duration(milliseconds: 500),
-                      columnCount: 2,
-                      child: ScaleAnimation(
-                        child: FadeInAnimation(
-                          child: _buildBentoItem(context, provider, scan),
+                  child: StaggeredGrid.count(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    children: List.generate(filteredHistory.length, (index) {
+                      final scan = filteredHistory[index];
+                      // Favorites take 2 columns, others take 1
+                      final int crossAxisCellCount = scan.isFavorite ? 2 : 1;
+                      
+                      return StaggeredGridTile.fit(
+                        crossAxisCellCount: crossAxisCellCount,
+                        child: AnimationConfiguration.staggeredGrid(
+                          position: index,
+                          duration: const Duration(milliseconds: 500),
+                          columnCount: 2,
+                          child: ScaleAnimation(
+                            child: FadeInAnimation(
+                              child: _buildBentoItem(context, provider, scan),
+                            ),
+                          ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    }),
+                  ),
                 ),
               );
             },
@@ -80,83 +87,79 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final provider = context.read<HistoryProvider>();
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-      child: Column(
+      child: Row(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  onChanged: (val) => setState(() => _searchQuery = val),
-                  decoration: InputDecoration(
-                    hintText: 'Search history...',
-                    prefixIcon: const Icon(Icons.search, size: 20),
-                    filled: true,
-                    fillColor: Colors.white.withValues(alpha: 0.05),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
+          Expanded(
+            child: TextField(
+              onChanged: (val) => setState(() => _searchQuery = val),
+              decoration: InputDecoration(
+                hintText: 'Search history...',
+                prefixIcon: const Icon(Icons.search, size: 20),
+                filled: true,
+                contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                fillColor: Colors.white.withValues(alpha: 0.05),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
               ),
-              const SizedBox(width: 12),
-              const SizedBox(width: 8),
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.download, color: AppTheme.accent),
-                tooltip: 'Export History',
-                onSelected: (val) async {
-                  final p = context.read<HistoryProvider>();
-                  final messenger = ScaffoldMessenger.of(context);
-                  
-                  try {
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (_) => const AlertDialog(
-                        content: Row(
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(width: 16),
-                            Text('Exporting...'),
-                          ],
-                        ),
-                      ),
-                    );
+            ),
+          ),
+          const SizedBox(width: 8),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.download, color: AppTheme.accent),
+            tooltip: 'Export History',
+            onSelected: (val) async {
+              final p = context.read<HistoryProvider>();
+              final messenger = ScaffoldMessenger.of(context);
+              
+              try {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) => const AlertDialog(
+                    content: Row(
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(width: 16),
+                        Text('Exporting...'),
+                      ],
+                    ),
+                  ),
+                );
 
-                    String? path;
-                    if (val == 'csv') {
-                      path = await p.exportToCSV();
-                    } else {
-                      path = await p.exportToPDF();
-                    }
-                    
-                    if (context.mounted) Navigator.pop(context);
+                String? path;
+                if (val == 'csv') {
+                  path = await p.exportToCSV();
+                } else {
+                  path = await p.exportToPDF();
+                }
+                
+                if (context.mounted) Navigator.pop(context);
 
-                    if (context.mounted && path != null) {
-                      messenger.showSnackBar(
-                        SnackBar(content: Text('History exported to: $path')),
-                      );
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      Navigator.pop(context);
-                      messenger.showSnackBar(
-                        SnackBar(content: Text('Export failed: ${e.toString().replaceAll('Exception: ', '')}')),
-                      );
-                    }
-                  }
-                },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(value: 'csv', child: Text('Export as CSV')),
-                  const PopupMenuItem(value: 'pdf', child: Text('Export as PDF')),
-                ],
-              ),
-              IconButton(
-                onPressed: () => _showClearConfirmation(context, provider),
-                icon: const Icon(Icons.delete_sweep_outlined, color: Colors.redAccent),
-                tooltip: 'Clear All History',
-              ),
+                if (context.mounted && path != null) {
+                  messenger.showSnackBar(
+                    SnackBar(content: Text('History exported to: $path')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  messenger.showSnackBar(
+                    SnackBar(content: Text('Export failed: ${e.toString().replaceAll('Exception: ', '')}')),
+                  );
+                }
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: 'csv', child: Text('Export as CSV')),
+              const PopupMenuItem(value: 'pdf', child: Text('Export as PDF')),
             ],
+          ),
+          IconButton(
+            onPressed: () => _showClearConfirmation(context, provider),
+            icon: const Icon(Icons.delete_sweep_outlined, color: Colors.redAccent),
+            tooltip: 'Clear All History',
           ),
         ],
       ),
@@ -219,7 +222,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildBentoItem(BuildContext context, HistoryProvider provider, ScanHistory scan) {
-    // If it's a favorite, it takes full width (2 columns), otherwise 1
     final isWide = scan.isFavorite;
     
     return RepaintBoundary(
@@ -231,7 +233,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
             color: Colors.redAccent.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(24),
           ),
           child: const Icon(Icons.delete, color: Colors.redAccent),
         ),
@@ -251,7 +253,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             );
           },
           child: Container(
-            constraints: BoxConstraints(minHeight: isWide ? 100 : 140),
+            constraints: BoxConstraints(minHeight: isWide ? 100 : 150),
             decoration: BoxDecoration(
               color: AppTheme.surface.withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(24),
@@ -263,7 +265,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min, // Use min size to avoid forced expansion
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -292,33 +294,36 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  scan.content,
-                  maxLines: isWide ? 2 : 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: isWide ? 15 : 13,
-                    color: AppTheme.textPrimary,
+                Flexible(
+                  child: Text(
+                    scan.content.trim(),
+                    maxLines: isWide ? 2 : 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      height: 1.3,
+                      fontSize: isWide ? 16 : 14,
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      DateFormat('MMM dd').format(scan.scannedAt),
+                      DateFormat('MMM dd, yyyy').format(scan.scannedAt),
                       style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         scan.category.toUpperCase(),
-                        style: const TextStyle(fontSize: 8, color: AppTheme.textSecondary, fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontSize: 9, color: AppTheme.textSecondary, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                       ),
                     ),
                   ],
