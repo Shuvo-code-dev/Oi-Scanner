@@ -8,7 +8,6 @@ import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:google_mlkit_language_id/google_mlkit_language_id.dart';
 import '../theme/app_theme.dart';
 import '../providers/history_provider.dart';
-import './ad_banner_widget.dart';
 
 class ScanResultSheet extends StatefulWidget {
   final String content;
@@ -154,7 +153,6 @@ class _ScanResultSheetState extends State<ScanResultSheet> {
                   const SizedBox(height: 32),
                   _buildActionButtons(context, context.read<HistoryProvider>()),
                   const SizedBox(height: 20),
-                  const AdBannerWidget(),
                 ],
               ),
             ),

@@ -5,7 +5,6 @@ import './generator_screen.dart';
 import './history_screen.dart';
 import './settings_screen.dart';
 import 'package:provider/provider.dart';
-import '../providers/history_provider.dart';
 import '../providers/navigation_provider.dart';
 import '../providers/language_provider.dart';
 
@@ -57,7 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: navProvider.currentIndex,
         onTap: (index) {
           navProvider.setIndex(index);
-          context.read<HistoryProvider>().incrementScreenChange();
         },
         type: BottomNavigationBarType.fixed,
         items: [

@@ -6,7 +6,6 @@ import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import '../theme/app_theme.dart';
-import '../widgets/ad_banner_widget.dart';
 import 'package:gal/gal.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -216,7 +215,6 @@ class _GeneratorScreenState extends State<GeneratorScreen> {
                 _buildActionButtons(),
               ],
               const SizedBox(height: 40),
-              const AdBannerWidget(),
             ],
           ),
         ),

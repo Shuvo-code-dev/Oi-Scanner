@@ -12,7 +12,6 @@ import '../providers/history_provider.dart';
 import '../models/scan_history_model.dart';
 import '../theme/app_theme.dart';
 import '../widgets/scan_result_sheet.dart';
-import '../widgets/ad_banner_widget.dart';
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
@@ -127,6 +126,26 @@ class _ScannerScreenState extends State<ScannerScreen> {
     }
   }
 
+  void _triggerSuccessFeedback(HistoryProvider provider) async {
+    // Visual Pulse
+    setState(() => _isPulseActive = true);
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (mounted) setState(() => _isPulseActive = false);
+    });
+
+    // Double-Tap Haptic Pattern (Light then Medium)
+    if (provider.isHapticEnabled) {
+      await HapticFeedback.lightImpact();
+      await Future.delayed(const Duration(milliseconds: 60));
+      await HapticFeedback.mediumImpact();
+    }
+
+    // Audio Chime
+    if (provider.isSoundEnabled) {
+      await _audioPlayer.play(AssetSource('audio/beep.mp3'), volume: 0.5);
+    }
+  }
+
   void _onDetect(BarcodeCapture capture) {
     final List<Barcode> barcodes = capture.barcodes;
     if (barcodes.isNotEmpty) {
@@ -150,25 +169,12 @@ class _ScannerScreenState extends State<ScannerScreen> {
   void _handleScanSuccess(String code, {bool isOCR = false, bool isGallery = false}) {
     if (!isOCR && !isGallery && !_controller.value.isRunning) return;
     
-    // Feedback
-    if (!isOCR) {
-      _audioPlayer.resume();
-      // Complex Micro-interaction Pattern
-      HapticFeedback.vibrate(); 
-      Future.delayed(const Duration(milliseconds: 80), () => HapticFeedback.heavyImpact());
-      
-      _audioPlayer.seek(Duration.zero);
-      
-      // Neon Pulse Trigger
-      if (mounted) {
-        setState(() => _isPulseActive = true);
-        Future.delayed(const Duration(milliseconds: 300), () => setState(() {
-          if (mounted) _isPulseActive = false;
-        }));
-      }
-    }
-    
     final provider = context.read<HistoryProvider>();
+
+    // Premium Feedback
+    if (!isOCR) {
+      _triggerSuccessFeedback(provider);
+    }
 
     // Determine result type
     String resultType = isOCR ? 'text' : 'text';
@@ -335,30 +341,33 @@ class _ScannerScreenState extends State<ScannerScreen> {
             }
             _controller.setZoomScale(_zoomFactor);
           },
-          child: MobileScanner(
-            controller: _controller,
-            onDetect: _onDetect,
-            scanWindow: Rect.fromCenter(
-              center: Offset(
-                MediaQuery.of(context).size.width / 2, // Fixed center X
-                MediaQuery.of(context).size.height / 2, // Fixed center Y
-              ),
-              width: 250,
-              height: 250,
-            ),
-          ),
-        ),
-        // Blurry Shroud Backdrop
-        Positioned.fill(
-          child: CustomPaint(
-            painter: ScannerShroudPainter(
-              windowRect: Rect.fromCenter(
+          child: RepaintBoundary(
+            child: MobileScanner(
+              controller: _controller,
+              onDetect: _onDetect,
+              scanWindow: Rect.fromCenter(
                 center: Offset(
-                  MediaQuery.of(context).size.width / 2,
-                  MediaQuery.of(context).size.height / 2,
+                  MediaQuery.of(context).size.width / 2, // Fixed center X
+                  MediaQuery.of(context).size.height / 2, // Fixed center Y
                 ),
                 width: 250,
                 height: 250,
+              ),
+            ),
+          ),
+        ),
+        Positioned.fill(
+          child: RepaintBoundary(
+            child: CustomPaint(
+              painter: ScannerShroudPainter(
+                windowRect: Rect.fromCenter(
+                  center: Offset(
+                    MediaQuery.of(context).size.width / 2,
+                    MediaQuery.of(context).size.height / 2,
+                  ),
+                  width: 250,
+                  height: 250,
+                ),
               ),
             ),
           ),
@@ -372,43 +381,47 @@ class _ScannerScreenState extends State<ScannerScreen> {
               children: [
                 // Pulse Animation for Brackets
                 Positioned.fill(
-                  child: AnimatedBuilder(
-                    animation: _controller, // Using controller or a dedicated pulse
-                    builder: (context, child) {
-                      return CustomPaint(
-                        painter: ScannerBracketsPainter(
-                          pulse: _isPulseActive ? 1.0 : 0.0,
-                          color: AppTheme.accent,
-                        ),
-                      );
-                    },
-                  )
-                  .animate(onPlay: (c) => c.repeat(reverse: true))
-                  .scale(begin: const Offset(1, 1), end: const Offset(1.02, 1.02), duration: 1200.ms, curve: Curves.easeInOut),
+                  child: RepaintBoundary(
+                    child: AnimatedBuilder(
+                      animation: _controller, // Using controller or a dedicated pulse
+                      builder: (context, child) {
+                        return CustomPaint(
+                          painter: ScannerBracketsPainter(
+                            pulse: _isPulseActive ? 1.0 : 0.0,
+                            color: AppTheme.accent,
+                          ),
+                        );
+                      },
+                    )
+                    .animate(onPlay: (c) => c.repeat(reverse: true))
+                    .scale(begin: const Offset(1, 1), end: const Offset(1.02, 1.02), duration: 1200.ms, curve: Curves.easeInOut),
+                  ),
                 ),
                 // Neon Scan Line (Simplified but smoother)
-                Container(
-                  width: 250,
-                  height: 3,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppTheme.accent.withValues(alpha: 0),
-                        AppTheme.accent,
-                        AppTheme.accent.withValues(alpha: 0),
+                RepaintBoundary(
+                  child: Container(
+                    width: 250,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppTheme.accent.withValues(alpha: 0),
+                          AppTheme.accent,
+                          AppTheme.accent.withValues(alpha: 0),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.accent.withValues(alpha: 0.6),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
                       ],
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.accent.withValues(alpha: 0.6),
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                )
-                .animate(onPlay: (controller) => controller.repeat(reverse: true))
-                .moveY(begin: 0, end: 250, duration: 2500.ms, curve: Curves.easeInOut),
+                  )
+                  .animate(onPlay: (controller) => controller.repeat(reverse: true))
+                  .moveY(begin: 0, end: 250, duration: 2500.ms, curve: Curves.easeInOut),
+                ),
               ],
             ),
           ),
@@ -538,16 +551,6 @@ class _ScannerScreenState extends State<ScannerScreen> {
               child: const Text('Save Batch Result'),
             ),
           ),
-        // Ad Container
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            color: AppTheme.background,
-            child: const AdBannerWidget(),
-          ),
-        ),
       ],
     );
   }

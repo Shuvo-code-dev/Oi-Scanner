@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:csv/csv.dart';
@@ -14,30 +14,58 @@ import '../utils/wifi_util.dart';
 class HistoryProvider with ChangeNotifier {
   List<ScanHistory> _history = [];
   bool _isLoading = false;
-  int _scanCount = 0;
-  int _screenChangeCount = 0;
   
   // Phase 2 State
   bool isBatchMode = false;
   List<ScanHistory> batchScans = [];
   bool _isBiometricEnabled = false;
+  bool _isSoundEnabled = true;
+  bool _isHapticEnabled = true;
+
   bool get isBiometricEnabled => _isBiometricEnabled;
+  bool get isSoundEnabled => _isSoundEnabled;
+  bool get isHapticEnabled => _isHapticEnabled;
+
   set isBiometricEnabled(bool value) {
     _isBiometricEnabled = value;
+    _saveSettings();
+    notifyListeners();
+  }
+
+  set isSoundEnabled(bool value) {
+    _isSoundEnabled = value;
+    _saveSettings();
+    notifyListeners();
+  }
+
+  set isHapticEnabled(bool value) {
+    _isHapticEnabled = value;
+    _saveSettings();
     notifyListeners();
   }
   final LocalAuthentication _auth = LocalAuthentication();
 
-  InterstitialAd? _interstitialAd;
-  bool _isInterstitialAdReady = false;
-
   List<ScanHistory> get history => _history;
   bool get isLoading => _isLoading;
-  int get scanCount => _scanCount;
 
   HistoryProvider() {
+    _loadSettings();
     loadHistory();
-    _loadInterstitialAd();
+  }
+
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    _isSoundEnabled = prefs.getBool('sound_enabled') ?? true;
+    _isHapticEnabled = prefs.getBool('haptic_enabled') ?? true;
+    _isBiometricEnabled = prefs.getBool('biometric_enabled') ?? false;
+    notifyListeners();
+  }
+
+  Future<void> _saveSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('sound_enabled', _isSoundEnabled);
+    await prefs.setBool('haptic_enabled', _isHapticEnabled);
+    await prefs.setBool('biometric_enabled', _isBiometricEnabled);
   }
 
   Future<void> loadHistory() async {
@@ -60,12 +88,7 @@ class HistoryProvider with ChangeNotifier {
     }
 
     await DatabaseHelper.instance.insertScan(scan);
-    _scanCount++;
     await loadHistory();
-    
-    if (_scanCount % 3 == 0) {
-      showInterstitialAd();
-    }
   }
 
   Future<void> saveBatch() async {
@@ -229,36 +252,5 @@ class HistoryProvider with ChangeNotifier {
     if (resultType == 'payment') return 'Finance';
     if (resultType == 'event') return 'Events';
     return 'Other';
-  }
-
-  // AdMob Methods
-  void _loadInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId: 'ca-app-pub-3940256099942544/1033173712', // Test ID
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitialAd = ad;
-          _isInterstitialAdReady = true;
-        },
-        onAdFailedToLoad: (err) {
-          _isInterstitialAdReady = false;
-        },
-      ),
-    );
-  }
-
-  void showInterstitialAd() {
-    if (_isInterstitialAdReady && _interstitialAd != null) {
-      _interstitialAd!.show();
-      _loadInterstitialAd();
-    }
-  }
-
-  void incrementScreenChange() {
-    _screenChangeCount++;
-    if (_screenChangeCount % 10 == 0) {
-      showInterstitialAd();
-    }
   }
 }

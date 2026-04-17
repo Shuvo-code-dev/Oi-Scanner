@@ -5,7 +5,6 @@ import 'package:share_plus/share_plus.dart';
 import '../providers/history_provider.dart';
 import '../providers/language_provider.dart';
 import '../theme/app_theme.dart';
-import '../widgets/ad_banner_widget.dart';
 import 'policy_web_view.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -28,8 +27,13 @@ class SettingsScreen extends StatelessWidget {
       children: [
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(24),
             children: [
+              _buildBrandPreview(),
+              const SizedBox(height: 32),
+              _buildSectionHeader('System Feedback'),
+              _buildFeedbackToggles(provider),
+              const SizedBox(height: 32),
               _buildSectionHeader('Security'),
               SwitchListTile(
                 title: const Text('Biometric Lock'),
@@ -130,8 +134,91 @@ class SettingsScreen extends StatelessWidget {
             ],
           ),
         ),
-        const AdBannerWidget(),
       ],
+    );
+  }
+
+  Widget _buildBrandPreview() {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: AppTheme.surface.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.accent.withValues(alpha: 0.1),
+            blurRadius: 40,
+            spreadRadius: -10,
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppTheme.accent, width: 2),
+              boxShadow: [
+                BoxShadow(color: AppTheme.accent.withValues(alpha: 0.4), blurRadius: 20, spreadRadius: 2),
+              ],
+            ),
+            child: const Icon(Icons.qr_code_scanner_rounded, color: AppTheme.accent, size: 40),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'OI QR SCANNER',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 4,
+              color: Colors.white,
+            ),
+          ),
+          const Text(
+            'PREMIUM EDITION',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2,
+              color: AppTheme.accent,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeedbackToggles(HistoryProvider provider) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surface.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        children: [
+          SwitchListTile(
+            title: const Text('Sound Feedback'),
+            subtitle: const Text('Futuristic "Cyber-Chime" on success'),
+            value: provider.isSoundEnabled,
+            onChanged: (val) => provider.isSoundEnabled = val,
+            activeThumbColor: AppTheme.accent,
+            activeTrackColor: AppTheme.accent.withValues(alpha: 0.5),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16, color: Colors.white10),
+          SwitchListTile(
+            title: const Text('Haptic Feedback'),
+            subtitle: const Text('Premium "Double-Tap" tactile feel'),
+            value: provider.isHapticEnabled,
+            onChanged: (val) => provider.isHapticEnabled = val,
+            activeThumbColor: AppTheme.accent,
+            activeTrackColor: AppTheme.accent.withValues(alpha: 0.5),
+          ),
+        ],
+      ),
     );
   }
 

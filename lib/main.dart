@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import './theme/app_theme.dart';
 import './providers/history_provider.dart';
 import './providers/navigation_provider.dart';
@@ -8,7 +7,6 @@ import './providers/language_provider.dart';
 import './screens/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await MobileAds.instance.initialize();
   
   runApp(
     MultiProvider(

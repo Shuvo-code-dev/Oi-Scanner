@@ -8,7 +8,6 @@ import '../providers/language_provider.dart';
 import '../models/scan_history_model.dart';
 import '../theme/app_theme.dart';
 import '../widgets/scan_result_sheet.dart';
-import '../widgets/ad_banner_widget.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -73,7 +72,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
             },
           ),
         ),
-        const AdBannerWidget(),
       ],
     );
   }
