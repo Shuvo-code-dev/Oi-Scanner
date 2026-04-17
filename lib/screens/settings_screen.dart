@@ -29,8 +29,6 @@ class SettingsScreen extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.all(24),
             children: [
-              _buildBrandPreview(),
-              const SizedBox(height: 32),
               _buildSectionHeader('System Feedback'),
               _buildFeedbackToggles(provider),
               const SizedBox(height: 32),
@@ -56,10 +54,14 @@ class SettingsScreen extends StatelessWidget {
               _buildSectionHeader('Preferences'),
               ListTile(
                 title: const Text('Language / ভাষা'),
-                subtitle: Text(langProvider.currentLanguage == 'bn' ? 'বাংলা' : 'English'),
+                subtitle: Text(
+                  langProvider.currentLanguage == 'bn' ? 'বাংলা' : 'English',
+                ),
                 leading: const Icon(Icons.language, color: AppTheme.accent),
                 onTap: () {
-                  final newLang = langProvider.currentLanguage == 'en' ? 'bn' : 'en';
+                  final newLang = langProvider.currentLanguage == 'en'
+                      ? 'bn'
+                      : 'en';
                   langProvider.setLanguage(newLang);
                 },
               ),
@@ -115,7 +117,7 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 40),
               const Center(
                 child: Text(
-                  'By Oi Applications',
+                  'Powered By Oi Applications',
                   style: TextStyle(
                     color: AppTheme.textSecondary,
                     fontSize: 12,
@@ -138,60 +140,6 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBrandPreview() {
-    return Container(
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: AppTheme.surface.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.accent.withValues(alpha: 0.1),
-            blurRadius: 40,
-            spreadRadius: -10,
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppTheme.accent, width: 2),
-              boxShadow: [
-                BoxShadow(color: AppTheme.accent.withValues(alpha: 0.4), blurRadius: 20, spreadRadius: 2),
-              ],
-            ),
-            child: const Icon(Icons.qr_code_scanner_rounded, color: AppTheme.accent, size: 40),
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            'OI QR SCANNER',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 4,
-              color: Colors.white,
-            ),
-          ),
-          const Text(
-            'PREMIUM EDITION',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
-              color: AppTheme.accent,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildFeedbackToggles(HistoryProvider provider) {
     return Container(
       decoration: BoxDecoration(
@@ -208,7 +156,12 @@ class SettingsScreen extends StatelessWidget {
             activeThumbColor: AppTheme.accent,
             activeTrackColor: AppTheme.accent.withValues(alpha: 0.5),
           ),
-          const Divider(height: 1, indent: 16, endIndent: 16, color: Colors.white10),
+          const Divider(
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+            color: Colors.white10,
+          ),
           SwitchListTile(
             title: const Text('Haptic Feedback'),
             subtitle: const Text('Premium "Double-Tap" tactile feel'),

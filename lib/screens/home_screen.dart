@@ -30,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final langProvider = context.watch<LanguageProvider>();
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(
           langProvider.getText('app_title'),

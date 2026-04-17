@@ -126,24 +126,28 @@ class _ScannerScreenState extends State<ScannerScreen> {
     }
   }
 
-  void _triggerSuccessFeedback(HistoryProvider provider) async {
+  void _triggerSuccessFeedback(HistoryProvider provider) {
     // Visual Pulse
     setState(() => _isPulseActive = true);
     Future.delayed(const Duration(milliseconds: 400), () {
       if (mounted) setState(() => _isPulseActive = false);
     });
 
-    // Double-Tap Haptic Pattern (Light then Medium)
-    if (provider.isHapticEnabled) {
-      await HapticFeedback.lightImpact();
-      await Future.delayed(const Duration(milliseconds: 60));
-      await HapticFeedback.mediumImpact();
+    // Audio Feedback (Non-blocking)
+    if (provider.isSoundEnabled) {
+      _audioPlayer.stop().then((_) => _audioPlayer.resume());
     }
 
-    // Audio Chime
-    if (provider.isSoundEnabled) {
-      await _audioPlayer.play(AssetSource('audio/beep.mp3'), volume: 0.5);
+    // Double-Tap Haptic Pattern (Non-blocking)
+    if (provider.isHapticEnabled) {
+      _triggerDoubleTapHaptic();
     }
+  }
+
+  Future<void> _triggerDoubleTapHaptic() async {
+    await HapticFeedback.lightImpact();
+    await Future.delayed(const Duration(milliseconds: 60));
+    await HapticFeedback.mediumImpact();
   }
 
   void _onDetect(BarcodeCapture capture) {
@@ -428,136 +432,139 @@ class _ScannerScreenState extends State<ScannerScreen> {
             if (_isProcessingOCR)
               const Center(child: CircularProgressIndicator(color: AppTheme.accent)),
             
-            // Mode Controls & Batch Indicator (SafeArea)
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // Top Overlay: Mode Switcher & Help
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 10,
+              left: 20,
+              right: 20,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 48), // Spare space for balance
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        const SizedBox(width: 48), // Spare space for balance
-                        Container(
-                          padding: const EdgeInsets.all(4),
+                        _buildModeButton(true, 'QR Code'),
+                        _buildModeButton(false, 'Barcode'),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.help_outline, color: Colors.white, size: 28),
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      _showHelpGuide(context);
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            // Top-Sub Overlay: Batch Toggle (Fixed Position)
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 70,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildSmallToggle(
+                      icon: Icons.layers_outlined,
+                      label: 'Batch',
+                      isActive: provider.isBatchMode,
+                      onTap: () => provider.toggleBatchMode(),
+                    ),
+                    if (provider.isBatchMode && provider.batchScans.isNotEmpty) ...[
+                      const SizedBox(width: 12),
+                      GestureDetector(
+                        onTap: () => _showBatchPreview(context, provider),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
-                            color: Colors.black54,
-                            borderRadius: BorderRadius.circular(30),
+                            color: AppTheme.accent,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(color: AppTheme.accent.withValues(alpha: 0.3), blurRadius: 10),
+                            ],
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              _buildModeButton(true, 'QR Code'),
-                              _buildModeButton(false, 'Barcode'),
+                              const Icon(Icons.list_alt, size: 16, color: Colors.black),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${provider.batchScans.length}',
+                                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 12),
+                              ),
                             ],
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.help_outline, color: Colors.white, size: 28),
-                          onPressed: () {
-                            HapticFeedback.lightImpact();
-                            _showHelpGuide(context);
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildSmallToggle(
-                          icon: Icons.layers_outlined,
-                          label: 'Batch',
-                          isActive: provider.isBatchMode,
-                          onTap: () => provider.toggleBatchMode(),
-                        ),
-                        if (provider.isBatchMode && provider.batchScans.isNotEmpty) ...[
-                          const SizedBox(width: 12),
-                          GestureDetector(
-                            onTap: () => _showBatchPreview(context, provider),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: AppTheme.accent,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(color: AppTheme.accent.withValues(alpha: 0.3), blurRadius: 10),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.list_alt, size: 16, color: Colors.black),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${provider.batchScans.length}',
-                                    style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ).animate().scale(),
-                        ],
-                      ],
-                    ),
+                      ).animate().scale(),
+                    ],
                   ],
                 ),
               ),
             ),
 
-            // Bottom Controls (Relative to bottom)
+            // Bottom Overlay: Action Controls (Fixed)
             Positioned(
               bottom: 40,
               left: 40,
               right: 40,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  if (provider.isBatchMode && provider.batchScans.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 24),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 54,
-                        child: ElevatedButton(
-                          onPressed: () => provider.saveBatch(),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.accent,
-                            foregroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                          ),
-                          child: const Text('SAVE BATCH RESULTS', style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                      ).animate().slideY(begin: 1, end: 0),
-                    ),
+                  _buildCircleButton(
+                    icon: _isFlashOn ? Icons.flashlight_off_outlined : Icons.flashlight_on_outlined,
+                    onPressed: () {
+                      _controller.toggleTorch();
+                      setState(() => _isFlashOn = !_isFlashOn);
+                    },
+                  ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _buildCircleButton(
-                        icon: _isFlashOn ? Icons.flashlight_off_outlined : Icons.flashlight_on_outlined,
-                        onPressed: () {
-                          _controller.toggleTorch();
-                          setState(() => _isFlashOn = !_isFlashOn);
-                        },
+                        icon: Icons.text_fields_outlined,
+                        onPressed: _pickImageAndProcessOCR,
                       ),
-                      Row(
-                        children: [
-                          _buildCircleButton(
-                            icon: Icons.text_fields_outlined,
-                            onPressed: _pickImageAndProcessOCR,
-                          ),
-                          const SizedBox(width: 20),
-                          _buildCircleButton(
-                            icon: Icons.image_outlined,
-                            onPressed: _pickImageAndScanQR,
-                          ),
-                        ],
+                      const SizedBox(width: 20),
+                      _buildCircleButton(
+                        icon: Icons.image_outlined,
+                        onPressed: _pickImageAndScanQR,
                       ),
                     ],
                   ),
                 ],
               ),
             ),
+
+            // Bottom-Sub Overlay: Batch Save Button (Animated Float Overlay)
+            if (provider.isBatchMode && provider.batchScans.isNotEmpty)
+              Positioned(
+                bottom: 120,
+                left: 40,
+                right: 40,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: ElevatedButton(
+                    onPressed: () => provider.saveBatch(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.accent,
+                      foregroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    ),
+                    child: const Text('SAVE BATCH RESULTS', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1)),
+                  ),
+                ).animate().slideY(begin: 1, end: 0, duration: 400.ms, curve: Curves.easeOutBack),
+              ),
           ],
         );
       },
@@ -588,15 +595,31 @@ class _ScannerScreenState extends State<ScannerScreen> {
   Widget _buildModeButton(bool isQR, String label) {
     bool selected = _isScanModeQR == isQR;
     return GestureDetector(
-      onTap: () {
-        HapticFeedback.selectionClick();
+      onTap: () async {
         if (_isScanModeQR == isQR) return;
+        HapticFeedback.selectionClick();
 
+        // Safety Delay & Reset to prevent White Screen / Hardware Lock
+        final oldController = _controller;
+        
         setState(() {
           _isScanModeQR = isQR;
-          
-          // Dispose old controller and create new one with optimized formats
-          final oldController = _controller;
+          // Temporarily set controller to a paused state or stop it
+        });
+
+        try {
+          await oldController.stop();
+          await oldController.dispose();
+        } catch (e) {
+          debugPrint('Controller dispose error: $e');
+        }
+
+        // Small hardware reset buffer
+        await Future.delayed(const Duration(milliseconds: 150));
+
+        if (!mounted) return;
+
+        setState(() {
           _controller = MobileScannerController(
             detectionSpeed: DetectionSpeed.unrestricted,
             formats: isQR ? [BarcodeFormat.qrCode] : [
@@ -608,8 +631,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
               BarcodeFormat.upcE,
             ],
             torchEnabled: _isFlashOn,
+            autoStart: true,
           );
-          oldController.dispose();
         });
       },
       child: Container(
