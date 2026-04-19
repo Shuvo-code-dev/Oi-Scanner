@@ -1,81 +1,139 @@
-# Oi QR Scanner 🟢
+<div align="center">
 
-[![Premium](https://img.shields.io/badge/Experience-Premium-green.svg)]()
-[![Ads](https://img.shields.io/badge/Ads-None-red.svg)]()
-[![Privacy](https://img.shields.io/badge/Privacy-On--Device-blue.svg)]()
+<img src="https://img.shields.io/badge/Flutter-3.11.1+-02569B?style=for-the-badge&logo=flutter&logoColor=white" />
+<img src="https://img.shields.io/badge/Android-API%2021+-3DDC84?style=for-the-badge&logo=android&logoColor=white" />
+<img src="https://img.shields.io/badge/iOS-12.0+-000000?style=for-the-badge&logo=apple&logoColor=white" />
+<img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" />
 
-**Oi QR Scanner** is a world-class, high-contrast, and ultra-fast utility suite designed for users who demand both aesthetic excellence and uncompromising privacy. Built with Flutter and Google ML Kit, it delivers a high-performance scanning experience with a professional-grade design system.
+<br/><br/>
 
----
+# 🟢 Oi QR Scanner
 
-## ✨ Key Features
+### *Scan. Detect. Protect.*
 
-### 🛡️ Safety Shield
-Scan with confidence. Our real-time URL verification system analyzes links for potential risks, masked URLs (shorteners), and insecure protocols (HTTP) before you tap.
+**The world's most beautiful QR & Barcode scanner — built for privacy, speed, and style.**
 
-### 🍱 Bento Design System
-A cutting-edge visual experience. Your scan history is organized in a beautiful, staggered Bento Grid with Glassmorphic cards that react dynamically to your interactions.
+[⬇️ Download APK](#) &nbsp;·&nbsp; [🐛 Report Bug](https://github.com/Shuvo-code-dev/Oi-QR-Scanner/issues) &nbsp;·&nbsp; [✨ Request Feature](https://github.com/Shuvo-code-dev/Oi-QR-Scanner/issues)
 
-### ⚡ Blazing Speed
-Detection in as little as **0.04 seconds**. Optimized for efficiency, the scanner ROI is decoupled for rapid and precise results even in low-light conditions.
+<br/>
 
-### 🎨 High-Contrast Neon UI
-Designed for maximum legibility and style. A deep slate and neon green palette combined with smooth shared-axis transitions provides a premium dark-mode feeling.
+[![Premium Experience](https://img.shields.io/badge/Experience-Premium-00FF88?style=flat-square)]()
+[![Zero Ads](https://img.shields.io/badge/Ads-Zero-FF4444?style=flat-square)]()
+[![On-Device Privacy](https://img.shields.io/badge/Privacy-100%25%20On--Device-4A9EFF?style=flat-square)]()
+[![Made in Bangladesh](https://img.shields.io/badge/Made%20with%20❤️-Bangladesh-006A4E?style=flat-square)]()
 
-### 🤫 100% Ad-Free
-No banners, no interstitials, no tracking. Just pure utility, maximizing screen real-estate and user focus.
-
-### 🔊 Tactile & Auditory Feedback
-- **Double-Tap Haptics**: Custom tactile feedback for successful scans.
-- **Cyber-Chime**: Futuristic audio confirmation for a truly tech-forward experience.
+</div>
 
 ---
 
-## 🛠️ Technical Specs
+## 📖 Overview
 
-- **Core Framework**: [Flutter](https://flutter.dev)
-- **Engine**: [Google ML Kit](https://developers.google.com/ml-kit) (On-Device Text & Barcode)
-- **Scanning Engine**: Optimized Mobile Scanner (DetectionSpeed.unrestricted)
-- **Security**: Local Biometric Authentication (Face/Fingerprint)
-- **Persistence**: SQLite (Local Database)
-- **Export**: Professional PDF & CSV reporting.
+**Oi QR Scanner** is a premium, open-source utility app for Android & iOS — built with Flutter and powered by Google ML Kit. It combines blazing-fast on-device scanning with a stunning Neon Bento UI design system, real-time URL safety checks, and biometric-grade security.
+
+No internet. No ads. No compromise.
 
 ---
 
-## 🚦 Getting Started
+## ✨ Features
+
+| Feature | Description |
+|---|---|
+| 🛡️ **Safety Shield** | Real-time URL risk detection — flags shorteners, HTTP links & malicious URLs before you tap |
+| ⚡ **Blazing Speed** | Scan detection in as little as **0.04 seconds**, even in low-light |
+| 🍱 **Bento Grid UI** | Staggered history layout with Glassmorphic cards and smooth shared-axis transitions |
+| 🎨 **Neon Dark Theme** | Deep slate + neon green palette with high-contrast legibility |
+| 🔒 **Biometric Lock** | Face ID / Fingerprint authentication to protect your scan history |
+| 📄 **PDF & CSV Export** | Generate professional reports from your scan history |
+| 🔦 **Flashlight Toggle** | Instant torch control for dark environments |
+| 🔊 **Tactile Feedback** | Double-tap haptics + cyber-chime audio on successful scans |
+| 🤫 **100% Ad-Free** | No banners. No interstitials. No tracking. Ever. |
+
+---
+
+## 🛠️ Tech Stack
+
+```
+🏗️  Framework     →  Flutter (^3.11.1)
+🧠  ML Engine     →  Google ML Kit (On-Device Barcode & Text)
+📷  Scanner       →  Mobile Scanner (DetectionSpeed.unrestricted)
+🗄️  Database      →  SQLite (Local Persistence)
+🔐  Auth          →  Local Biometric (Face / Fingerprint)
+📤  Export        →  PDF & CSV Generator
+```
+
+**Supported Barcode Formats:**
+`QR Code` · `EAN-13` · `EAN-8` · `UPC-A` · `UPC-E` · `Code 128` · `Code 39` · `ITF` · `PDF417` · `Aztec` · `Data Matrix`
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Flutter SDK (^3.11.1)
-- Android API 21+ / iOS 12.0+
+
+- Flutter SDK `^3.11.1`
+- Android API `21+` or iOS `12.0+`
+- Dart `^3.0`
 
 ### Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/oiapplications/oiqrscanner.git
-   ```
-2. Install dependencies:
-   ```bash
-   flutter pub get
-   ```
-3. Run the application:
-   ```bash
-   flutter run --release
-   ```
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Shuvo-code-dev/Oi-QR-Scanner.git
+
+# 2. Navigate to project directory
+cd Oi-QR-Scanner
+
+# 3. Install dependencies
+flutter pub get
+
+# 4. Run in release mode
+flutter run --release
+```
+
+> 💡 **Tip:** Always run in `--release` mode for accurate performance benchmarks.
 
 ---
 
 ## 🔒 Privacy & Security
 
-We believe your data is yours. 
-- **100% On-Device**: Scanned images and text never leave the device.
-- **No Cloud Required**: All ML processing is performed locally.
-- **Encryption**: Exported reports are saved locally to protected app directories.
+> *Your data never leaves your device. Period.*
 
-See [SECURITY.md](SECURITY.md) for more details.
+- ✅ **100% On-Device Processing** — no data sent to any server
+- ✅ **No Cloud Dependency** — all ML runs locally via Google ML Kit
+- ✅ **No Analytics / Tracking** — zero third-party data collection
+- ✅ **Biometric Protection** — optional Face/Fingerprint lock on history
+- ✅ **Encrypted Local Storage** — exports saved to protected app directories
+
+For full details, see [`SECURITY.md`](SECURITY.md)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+For bugs or feature requests, please [open an issue](https://github.com/Shuvo-code-dev/Oi-QR-Scanner/issues).
 
 ---
 
 ## 📜 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-© 2026 Oi Applications. Made with ❤️ in Bangladesh.
+This project is licensed under the **MIT License** — see the [`LICENSE`](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+**© 2026 Oi Applications**
+
+Proudly made with ❤️ in **Bangladesh** 🇧🇩
+
+*If you found this useful, please consider giving it a ⭐ — it means a lot!*
+
+</div>
