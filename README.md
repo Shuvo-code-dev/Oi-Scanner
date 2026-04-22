@@ -19,7 +19,7 @@
 [![Premium Experience](https://img.shields.io/badge/Experience-Premium-00FF88?style=flat-square)]()
 [![Zero Ads](https://img.shields.io/badge/Ads-Zero-FF4444?style=flat-square)]()
 [![On-Device Privacy](https://img.shields.io/badge/Privacy-100%25%20On--Device-4A9EFF?style=flat-square)]()
-[![Made in Bangladesh](https://img.shields.io/badge/Made%20with%20❤️-Bangladesh-006A4E?style=flat-square)]()
+[![Made in Bangladesh](https://img.shields.io/badge/Proudly%20made%20with%20❤️%20in-Bangladesh-006A4E?style=flat-square)]()
 
 </div>
 
